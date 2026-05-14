@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaint Desk</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: #121923;
+      --accent: #f5c542;
+      --accent-2: #5ad1ff;
+      --text: #f2f5f7;
+      --muted: #a5b0bd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Gill Sans", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(800px 500px at 15% 10%, #1b2535 0%, transparent 60%),
+        radial-gradient(700px 400px at 85% 20%, #1a1f2b 0%, transparent 55%),
+        linear-gradient(160deg, #0a0e13 0%, #0f141b 45%, #0b1118 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .shell {
+      width: min(980px, 100%);
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 24px;
+      animation: rise 0.6s ease-out both;
+    }
+
+    header {
+      display: grid;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .card {
+      background: linear-gradient(160deg, #111a25, #0f151e);
+      border: 1px solid #1f2935;
+      border-radius: 18px;
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .row {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #243142;
+      background: #0c1218;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 600;
+      background: linear-gradient(120deg, var(--accent), #ffda7a);
+      color: #1b1200;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #2a384d, #243246);
+      color: var(--text);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(245, 197, 66, 0.25);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(90, 209, 255, 0.12);
+      color: var(--accent-2);
+      font-size: 0.85rem;
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .item {
+      border: 1px solid #1e2a39;
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 6px;
+      background: #0b121a;
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: var(--accent-2);
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 880px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="card">
+      <span class="pill">JWT-enabled</span>
+      <h1>Complaint Desk</h1>
+      <p>Register, log in, and manage your complaints in one place. Uses the Spring Boot backend.</p>
+      <div class="row">
+        <label for="baseUrl">API base URL</label>
+        <input id="baseUrl" value="http://localhost:8080" />
+      </div>
+      <div class="row">
+        <label for="token">JWT token</label>
+        <input id="token" placeholder="Paste token after login" />
+      </div>
+      <button class="secondary" id="saveToken">Save token</button>
+      <p class="note" id="status">Ready.</p>
+    </header>
+
+    <section class="card">
+      <div class="row">
+        <h2>Register</h2>
+        <input id="regName" placeholder="Name" />
+        <input id="regEmail" placeholder="Email" />
+        <input id="regPassword" placeholder="Password" type="password" />
+        <button id="register">Create account</button>
+      </div>
+
+      <div class="row">
+        <h2>Login</h2>
+        <input id="loginEmail" placeholder="Email" />
+        <input id="loginPassword" placeholder="Password" type="password" />
+        <button id="login">Get token</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row">
+        <h2>Create complaint</h2>
+        <input id="complaintTitle" placeholder="Title" />
+        <textarea id="complaintDescription" placeholder="Describe the issue"></textarea>
+        <button id="createComplaint">Submit complaint</button>
+      </div>
+
+      <div class="row">
+        <h2>My complaints</h2>
+        <button class="secondary" id="loadComplaints">Refresh list</button>
+        <div class="list" id="complaintList"></div>
+      </div>
+
+      <div class="row">
+        <h2>Update status</h2>
+        <input id="statusId" placeholder="Complaint ID" />
+        <select id="statusValue">
+          <option value="OPEN">OPEN</option>
+          <option value="IN_PROGRESS">IN_PROGRESS</option>
+          <option value="RESOLVED">RESOLVED</option>
+        </select>
+        <button class="secondary" id="updateStatus">Update</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const tokenInput = document.getElementById("token");
+
+    const setStatus = (message) => {
+      statusEl.textContent = message;
+    };
+
+    const getBaseUrl = () => document.getElementById("baseUrl").value.trim();
+
+    const getToken = () => tokenInput.value.trim();
+
+    const request = async (path, options = {}) => {
+      const baseUrl = getBaseUrl();
+      const response = await fetch(`${baseUrl}${path}`, options);
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Request failed");
+      }
+      return response.json();
+    };
+
+    document.getElementById("saveToken").addEventListener("click", () => {
+      localStorage.setItem("jwtToken", getToken());
+      setStatus("Token saved.");
+    });
+
+    document.getElementById("register").addEventListener("click", async () => {
+      try {
+        const payload = {
+          name: document.getElementById("regName").value.trim(),
+          email: document.getElementById("regEmail").value.trim(),
+          password: document.getElementById("regPassword").value.trim()
+        };
+        const data = await request("/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        tokenInput.value = data.token;
+        setStatus("Registered. Token ready.");
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    document.getElementById("login").addEventListener("click", async () => {
+      try {
+        const payload = {
+          email: document.getElementById("loginEmail").value.trim(),
+          password: document.getElementById("loginPassword").value.trim()
+        };
+        const data = await request("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        tokenInput.value = data.token;
+        setStatus("Logged in. Token ready.");
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    document.getElementById("createComplaint").addEventListener("click", async () => {
+      try {
+        const payload = {
+          title: document.getElementById("complaintTitle").value.trim(),
+          description: document.getElementById("complaintDescription").value.trim()
+        };
+        await request("/complaints", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`
+          },
+          body: JSON.stringify(payload)
+        });
+        setStatus("Complaint submitted.");
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    document.getElementById("loadComplaints").addEventListener("click", async () => {
+      try {
+        const list = document.getElementById("complaintList");
+        list.innerHTML = "";
+        const data = await request("/complaints", {
+          headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        data.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <strong>#${item.id} ${item.title}</strong>
+            <span class="status">${item.status}</span>
+            <span class="note">${item.description}</span>
+          `;
+          list.appendChild(div);
+        });
+        setStatus("Complaints loaded.");
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    document.getElementById("updateStatus").addEventListener("click", async () => {
+      try {
+        const id = document.getElementById("statusId").value.trim();
+        const status = document.getElementById("statusValue").value;
+        await request(`/complaints/${id}/status?status=${status}`, {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        setStatus("Status updated.");
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    const savedToken = localStorage.getItem("jwtToken");
+    if (savedToken) {
+      tokenInput.value = savedToken;
+    }
+  </script>
+</body>
+</html>
